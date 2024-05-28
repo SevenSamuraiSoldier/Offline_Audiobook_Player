@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Audiobook Player</title>
+    <meta charset="UTF-8" />
+    <meta name="AudioBook Player" content="Single Page Offline App" />
+    <link rel="icon" type="image/png" href="flavicon.png">
+    <meta name="keywords" content="HTML, CSS, JavaScript" />
+    <meta name="Unknown" content="N/A" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        box-sizing: border-box;
+        background-color: rgb(57, 58, 58);
+        font-family: Quicksand;
+        margin: 0;
+      }
+      .h1_title {
+        color: aliceblue;
+        text-align: center;
+        padding: 0.75em; 
+        margin-bottom: 0;
+        margin-top: 0;
+        font-size: 1.5em;
+      }
+      
+      .fullscreen_button {
+        position: absolute;
+        top: 1em;
+        right: 1em;
+        padding: 0.5em;
+        margin: 0.5em;
+        min-width: 10em;
+      }
+
+      .audio_div {
+        /* width: 1000px !important; */
+        /* align-content: center; */
+
+        text-align: center;
+        display: flex;
+        flex-wrap: wrap;
+        /* width: fill; */
+      }
+      audio::-webkit-media-controls-enclosure {
+        border-radius: 5px;
+        background-color: #aed580;
+        width: 100%;
+      }
+      audio::-webkit-media-controls-play-button {
+        background-color: #0b8142;
+        opacity: 80%;
+        border-style: none;
+        border-radius: 1em;
+        accent-color: aliceblue;
+      }
+      audio {
+        border-radius: 10px;
+        width: 100%;
+        padding: 0em;
+        padding-left: 1em;
+        padding-right: 1em;
+
+        /* margin-top: 5em;
+          margin-bottom: 30px; */
+        background-color: rgb(255, 127, 80) 50;
+      }
+
+      audio:hover {
+        /* transform: scale(1.05); */
+        filter: drop-shadow(2px 3px 3px #333);
+      }
+
+      .cont2 {
+        display: flex;
+        flex-wrap: wrap;
+        /* gap: 2em; */
+        /* margin: 1em; */
+        flex-direction: row;
+        align-content: space-around;
+        justify-content: flex-start;
+        align-items: center;
+        color: hsl(180, 100%, 97%);
+        margin-left: 1em; /* added on 2nd march*/
+      }
+      .cont2 > * {
+        padding: 0.5em;
+        margin: 0.25em;
+        margin-left: 0em;
+        margin-right: 0.5em;
+      }
+
+      /* .spped_button {
+      
+      padding: 20px;
+      width: 50px;
+      margin-bottom: 10px;
+    } */
+      .choose_file {
+        margin: 1em;
+        color: hsl(180, 100%, 97%);
+        margin-bottom: 0.5em;
+        margin-left: 1em;
+      }
+      .choose_file > * {
+        padding: 0.5em;
+        
+        margin-left: 0em;
+      }
+      .jump_button_div /* added on 2nd march*/ {
+        margin-top: 0em;
+        display: flex;
+        flex-wrap: wrap;
+        /* gap: 2em; */
+        margin-left: 1em;
+        margin-bottom: 0em;
+        flex-direction: row;
+        align-content: space-around;
+        justify-content: start;
+        align-items: center;
+      }
+      .speed_button_div
+      {
+        display: flex;
+        flex-wrap: wrap;
+        /* gap: 2em; */
+        margin: 2em;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: 1em;
+        margin-right: 1em;
+        min-width: 5em;
+            
+        flex-direction: row;
+        align-content: space-around;
+        justify-content: start;
+        align-items: center;
+
+        border-radius: 0.75em;
+        border-style: solid;
+        border-color: #32ac71;
+        /* border-width: 0.25em; */
+        transition: all 0.2s ease-out;
+      }
+      
+     
+      .speed_button_div > * ,
+      .jump_button_div > * /* added on 2nd march*/{
+        padding: 0.5em;
+        
+        margin: 0.5em;
+        
+        margin-right: 0.25em;
+        min-width: 5em;  
+        /* border-color: #32AC71; */
+        border-radius: 0.75em;
+        border-style: solid;
+        border-color: #32ac71;
+        border-width: 0.25em;
+        transition: all 0.05s ease-out;
+      }
+
+      .BM_MainROW {
+        background-color: #aed580;
+        border-color: hsl(151, 55%, 44%);
+        border-bottom-width: 0.15em;
+        border-style: solid;
+        border-radius: 0.5em;
+        padding: 0.5em;
+        display: grid;
+        /* gap: 5px; */
+        grid-template-columns: 30% 1fr 1fr 1fr 1fr;
+        align-items: center;
+        
+        margin: 1em;
+        margin-bottom: 0.25em;
+        margin-top: 0.25em;
+      }
+      .BM_MainROW > * {
+        width: 100%;
+        /* padding:ch; */
+        padding-inline: 0.75em;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+        align-self: center;
+        box-sizing: border-box;
+      }
+      .BM_timestamp {
+        text-align: center;
+      }
+
+      .table1 {
+        display: grid;
+      }
+
+      .BM_name,
+      .text_field {
+        border-radius: 0.75em;
+        border-style: solid;
+        border-color: #32ac71;
+        border-width: 0.25em;
+
+        /* border-width: 0;
+      border-radius: 0.3em; */
+        transition: 0.5s;
+      }
+      .BM_name:hover,
+      .BM_name:focus {
+        transform: translateX(5em) scale(1.3);
+
+        background-color: #0b552b;
+        border-style: solid;
+        color: aliceblue;
+        font-weight: 700;
+
+        /* color: rgb(139, 60, 60);
+      background-color: hsl(0, 0%, 79%); */
+      }
+      /* .BM_name:hover{cursor: pointer;
+} */
+      .BM_name:focus {
+        outline: 2em;
+
+        /* cursor: input; */
+      }
+
+      .BM_delete,
+      .BM_play,
+      .add_BM,
+      .play_from,
+      .choose_button,
+      .BM_save,
+      .BM_load,
+      .fullscreen_button,
+      .button {
+        
+        margin-right: 0.5em;
+        margin-left: 0em;
+        min-width: 3em;
+        /* border-color: #32AC71; */
+        border-radius: 0.75em;
+        border-style: solid;
+        border-color: #32ac71;
+        border-width: 0.25em;
+        transition: all 0.05s ease-out;
+      }
+
+      .BM_delete:hover,
+      .BM_play:hover,
+      .speed_button:hover,
+      .choose_button:hover,
+      .add_BM:hover,
+      .play_from:hover,
+      .BM_save:hover,
+      .BM_load:hover,
+      .fullscreen_button:hover,
+      .button:hover,
+      audio::-webkit-media-controls-play-button:hover {
+
+        cursor: pointer;
+        background-color: #0b552b;
+        /* color: aliceblue; */
+        color: aliceblue;
+        font-weight: 700;
+        transform: scale(1.1);
+      }
+      .choose_button:hover {
+        transform: scale(1.05);
+      }
+
+    </style>
+    
+  </head>
+  <body>
+    <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLWKjhJtqVAbllLK6r2dnGjUVWB_cFNcuO" title="YouTube video player" frameborder="10" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
+    <h1 class="h1_title">Audio Book Player</h1>
+    <button onclick="toggle_full_screen()" class="fullscreen_button">
+      FullScreen
+    </button>
+
+    <div id="audio_div" class="audio_div">
+      <audio id="player" controls>
+        <source src="" type="audio/mpeg" />
+      </audio>
+    </div>
+
+    <div class="choose_file">
+      <label class="text_field">Select Audiobook (.mp3/.m4a/.wav)</label>
+      <input
+        class="choose_button"
+        type="file"
+        id="audio-file"
+        accept="audio/*"
+      />
+      <button class="add_BM" onclick="add_Bookmark()">Add Bookmark</button>
+      <button onclick="save_Bookmarks_json()" class="BM_save">
+        Save Bookmarks
+      </button>
+      <!--  <input type="file" onclick="load_BM_Json_File()"  class="BM_load"/> -->
+      <input
+        type="file"
+        id="fileElem"
+        class="BM_load"
+        accept=".json,.JSON,.Json"
+        style="display: none"
+      />
+      <button id="fileSelect" class="BM_load" type="button">
+        Load BookMarks
+      </button>
+      <button
+        id="BM_display"
+        onclick="update_BM_Rows_Display()"
+        class="BM_load"
+        type="button"
+      >
+        Display BookMarks
+      </button>
+    </div>
+    <div class="jump_button_div">
+      <button class="button" id="H-jump-back" name="HJB"></button>
+      <button class="button" id="L-jump-back" name="LJB"></button>
+
+      <button class="button" id="previous"></button>
+      
+      <button class="button" id="next"></button>
+      <button class="button" id="L-jump-front"></button>
+      <button class="button" id="H-jump-front"></button>
+    </div>
+
+
+    <div class="speed_button_div">
+      <button id="1.0x" class="speed_button" onclick="set_Speed()" speed="1.0">
+        Reset
+      </button>
+      <button
+        id="1.05x"
+        class="speed_button"
+        onclick="set_Speed()"
+        speed="1.05"
+      >
+        1.05x
+      </button>
+      <button id="1.1x" class="speed_button" onclick="set_Speed()" speed="1.1">
+        1.10x
+      </button>
+      <button
+        id="1.15x"
+        class="speed_button"
+        onclick="set_Speed()"
+        speed="1.15"
+      >
+        1.15x
+      </button>
+      <button id="1.2x" class="speed_button" onclick="set_Speed()" speed="1.2">
+        1.20x
+      </button>
+      <button
+        id="1.25x"
+        class="speed_button"
+        onclick="set_Speed()"
+        speed="1.25"
+      >
+        1.25x
+      </button>
+      <button id="1.3x" class="speed_button" onclick="set_Speed()" speed="1.3">
+        1.30x
+      </button>
+      <button
+        id="1.35x"
+        class="speed_button"
+        onclick="set_Speed()"
+        speed="1.35"
+      >
+        1.35x
+      </button>
+      <button id="1.4x" class="speed_button" onclick="set_Speed()" speed="1.4">
+        1.40x
+      </button>
+      <button
+        id="1.45x"
+        class="speed_button"
+        onclick="set_Speed()"
+        speed="1.45"
+      >
+        1.45x
+      </button>
+      <button id="1.5x" class="speed_button" onclick="set_Speed()" speed="1.5">
+        1.50x
+      </button>
+      <button
+        id="1.65x"
+        class="speed_button"
+        onclick="set_Speed()"
+        speed="1.65"
+      >
+        1.65x
+      </button>
+    </div>
+    
+    <div class="cont2">
+      <button class="play_from" onclick="playFrom()">Play from</button>
+      <input class="text_field" type="number" id="timeStamp" />
+
+      
+
+      <div>Timestamp:</div>
+      <input class="text_field" type="text" id="timepaused" />
+
+      <label id="current_speed"> Current Playback Rate: </label>
+    </div>
+
+    <!-- //Main BM Row Block -->
+    <div id="table1" class="table1">
+      <div class="BM_MainROW" id="BM_MainROW">
+        <div class="BM_timestamp">BookMark Name</div>
+        <div class="BM_timestamp">Time Stamp</div>
+        <div class="BM_date">Time Created</div>
+        <!--
+        <input type="text" class="BM_name" value="NAME" />
+        <div class="BM_timestamp">Time Stamp</div>
+        <div class="BM_date">2023-3-2_0:42:30</div>
+        <button class="BM_play">Play</button>
+        <button class="BM_delete">Delete</button>
+        -->
+      </div>
+    </div>
+    <script>
+      function application_closing_prompt(e) {
+        if (!e) e = window.event;
+        //e.cancelBubble is supported by IE - this will kill the bubbling process.
+        e.cancelBubble = true;
+        e.returnValue = "You sure you want to leave?"; //This is displayed on the dialog
+
+        //e.stopPropagation works in Firefox.
+        if (e.stopPropagation) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      }
+      window.onbeforeunload = application_closing_prompt;
+    </script>
+    <script>
+      function toggle_full_screen() {
+        if (
+          (document.fullScreenElement && document.fullScreenElement !== null) ||
+          (!document.mozFullScreen && !document.webkitIsFullScreen)
+        ) {
+          if (document.documentElement.requestFullScreen) {
+            document.documentElement.requestFullScreen();
+          } else if (document.documentElement.mozRequestFullScreen) {
+            /* Firefox */
+            document.documentElement.mozRequestFullScreen();
+          } else if (document.documentElement.webkitRequestFullScreen) {
+            /* Chrome, Safari & Opera */
+            document.documentElement.webkitRequestFullScreen(
+              Element.ALLOW_KEYBOARD_INPUT
+            );
+          } else if (document.msRequestFullscreen) {
+            /* IE/Edge */
+            document.documentElement.msRequestFullscreen();
+          }
+        } else {
+          if (document.cancelFullScreen) {
+            document.cancelFullScreen();
+          } else if (document.mozCancelFullScreen) {
+            /* Firefox */
+            document.mozCancelFullScreen();
+          } else if (document.webkitCancelFullScreen) {
+            /* Chrome, Safari and Opera */
+            document.webkitCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            /* IE/Edge */
+            document.msExitFullscreen();
+          }
+        }
+      }
+    </script>
+
+    <script>
+      const player = document.querySelector("#player");
+      const audioFile = document.querySelector("#audio-file");
+      const tempoBtn = document.querySelector("#tempo-btn");
+      //const BM_File = document.querySelector();
+      var x = document.getElementById("player");
+      var y = document.getElementById("timepaused");
+      var audiobook_name = "";
+      player.volume = 0.3;
+      const fileSelect = document.getElementById("fileSelect");
+      const fileElem = document.getElementById("fileElem");
+      const BM_reader = new FileReader();
+      var small_Jump = 5;
+      var large_Jump = 10;
+      var huge_Jump = 30;
+      var jump_backlogo ="&#9194";
+      var jump_frontlogo ="&#9193";
+
+      //Jump button text display--------------------------------------------
+      var HJB = document.getElementById("H-jump-back");
+      HJB.innerHTML = jump_backlogo+" -"+huge_Jump+" Sec";
+      var LJB = document.getElementById("L-jump-back");
+      LJB.innerHTML = jump_backlogo+" -"+large_Jump+" Sec";
+      var SJB = document.getElementById("previous");
+      SJB.innerHTML = jump_backlogo+" -"+small_Jump+" Sec";
+      var SJF = document.getElementById("next");
+      SJF.innerHTML = "+"+small_Jump+" Sec "+jump_frontlogo;
+      var LJF = document.getElementById("L-jump-front");
+      LJF.innerHTML = "+"+large_Jump+" Sec "+jump_frontlogo;
+      var HJF = document.getElementById("H-jump-front");
+      HJF.innerHTML = "+"+huge_Jump+" Sec "+jump_frontlogo;
+      //----------------------------------------------------------------------
+
+      fileSelect.addEventListener(
+        "click",
+        (evt) => {
+          if (fileElem) {
+            fileElem.click();
+            console.log("inside:");
+            
+          }
+          //console.log(evt.target.files[0]);
+        },
+        false
+      );
+
+      fileElem.addEventListener("change", (e) => {
+        console.log(e.target.files[0]);
+        var file = e.target.files[0];
+        BM_reader.addEventListener(
+          "load",
+          () => {
+            // this will then display a text file
+            //content.innerText = BM_reader.result;
+            BM_objct = JSON.parse(BM_reader.result);
+            console.log(BM_objct);
+          },
+          false
+        );
+
+        if (file) {
+          BM_reader.readAsText(file);
+          
+        }
+        
+
+        /* BM_objct = JSON.parse(e.target.files[0]);
+        console.log(BM_objct); */
+      });
+
+      function set_Speed() {
+        let active_speed_Button = document.activeElement;
+        let active_speed = active_speed_Button.getAttribute("speed");
+        console.log(active_speed);
+        player.playbackRate = active_speed;
+        let speed_label = document.getElementById("current_speed");
+        speed_label.innerHTML = "Current Playbck Rate:  " + active_speed;
+      }
+
+      function playFrom() {
+        var timeStamp = document.getElementById("timeStamp").value;
+        x.currentTime = timeStamp;
+        x.play();
+      }
+
+      audioFile.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (e.target.files[0] == null) {
+          console.log("empty file: ");
+          return;
+        }
+        player.src = URL.createObjectURL(file);
+        //console.log(player.src);
+        //console.log(e.target.files[0]);
+        //alert('Selected file with extension: ' + e.target.files[0].name);
+        audiobook_name = removeExtension(e.target.files[0].name);
+        console.log(audiobook_name);
+        alert("Selected file:  " + audiobook_name);
+        //console.log(e.target.files[0].webkitRelativePath);
+        /* alert('Selected file: ' + name.files.item(0).size);
+        alert('Selected file: ' + name.files.item(0).type); */
+      });
+    </script>
+
+    <script>
+      function add_pause_History() {
+        //do something
+      }
+
+      function load_BM_Json_File() {
+        //Load BM Json file from user device
+        //Then Modify BM_Objct as per the loaded file
+      }
+
+      function update_BM_Rows_Display() {
+        //update/ADD BM rows from BM Json file data
+        for (var key_TS in BM_objct) {
+          var BM_name1 = BM_objct[key_TS].name;
+          var BM_ts1 = BM_objct[key_TS].TS;
+          var BM_date1 = BM_objct[key_TS].date;
+
+          if (key_TS == 0) {
+            continue;
+          }
+
+          console.log("1: " + BM_name1 + " 2: " + BM_ts1 + " 3: " + BM_date1);
+
+          //Start--------------------------------------------------
+          //Create Main BM Row
+          var row = document.createElement("div");
+          row.setAttribute("class", "BM_MainROW");
+
+          //Create BM_Name #1
+          var name1 = document.createElement("input");
+          name1.type = "text";
+          name1.setAttribute("class", "BM_name");
+          name1.value = BM_name1;
+          row.appendChild(name1);
+
+          //Create BM_Time stamp #2
+          var timestamp1 = document.createElement("div");
+
+          const timeinseconds = new Date(null);
+          timeinseconds.setSeconds(BM_ts1); // specify value for SECONDS here
+          const formatted_Timestamp = timeinseconds.toISOString().slice(11, 19);
+          timestamp1.innerHTML = formatted_Timestamp;
+          timestamp1.setAttribute("class", "BM_timestamp");
+
+
+          //timestamp1.innerHTML = BM_ts1;
+          //timestamp1.setAttribute("class", "BM_timestamp");
+          row.appendChild(timestamp1);
+
+          //Create BM_Date #3
+          var date1 = document.createElement("div");
+          datetimecalc = currentDateandTime();
+          date1.innerHTML = BM_date1;
+          date1.setAttribute("class", "BM_date");
+          row.appendChild(date1);
+
+          //Create BM_Play button #4
+          var playbtn1 = document.createElement("button");
+          playbtn1.setAttribute("class", "BM_play");
+          playbtn1.setAttribute("onclick", "play_Selected_Bookmark()");
+          playbtn1.setAttribute("ts", `${BM_ts1}`);
+          //console.log("current time stamp: "+ playbtn1.getAttribute("ts"))
+          playbtn1.innerHTML = " Play Selected ";
+          row.appendChild(playbtn1);
+
+          //Create BM_Delete button #5
+          var deletebtn1 = document.createElement("button");
+          deletebtn1.setAttribute("class", "BM_delete");
+          deletebtn1.setAttribute("onclick", "row_Delete()");
+          deletebtn1.setAttribute("ts_dlt", `${BM_ts1}`);
+          deletebtn1.innerHTML = " Delete ";
+          row.appendChild(deletebtn1);
+
+          // Add the Row to the Table
+          let container = document.querySelector("#table1");
+          container.appendChild(row);
+        }
+      }
+
+      function add_Bookmark() {
+        x.pause();
+        y.value = x.currentTime;
+        bookmark_value = prompt("Please enter a Bookmark Name", "Chapter: ");
+        if (bookmark_value == null || bookmark_value == "Chapter: ") {
+          console.log("Name: Null");
+          return;
+        }
+        //Create Main BM Row
+        var row = document.createElement("div");
+        row.setAttribute("class", "BM_MainROW");
+
+        //Create BM_Name #1
+        var name1 = document.createElement("input");
+        name1.type = "text";
+        name1.setAttribute("class", "BM_name");
+        name1.value = bookmark_value;
+        row.appendChild(name1);
+
+        //Create BM_Time stamp #2
+        var timestamp1 = document.createElement("div");
+
+        const timeinseconds = new Date(null);
+        timeinseconds.setSeconds(x.currentTime); // specify value for SECONDS here
+        const formatted_Timestamp = timeinseconds.toISOString().slice(11, 19);
+        timestamp1.innerHTML = formatted_Timestamp;
+        timestamp1.setAttribute("class", "BM_timestamp");
+
+
+        //timestamp1.innerHTML = x.currentTime;
+        //timestamp1.setAttribute("class", "BM_timestamp");
+        row.appendChild(timestamp1);
+
+        //Create BM_Date #3
+        var date1 = document.createElement("div");
+        datetimecalc = currentDateandTime();
+        date1.innerHTML = datetimecalc;
+        date1.setAttribute("class", "BM_date");
+        row.appendChild(date1);
+
+        //Create BM_Play button #4
+        var playbtn1 = document.createElement("button");
+        playbtn1.setAttribute("class", "BM_play");
+        playbtn1.setAttribute("onclick", "play_Selected_Bookmark()");
+        playbtn1.setAttribute("ts", `${x.currentTime}`);
+        //console.log("current time stamp: "+ playbtn1.getAttribute("ts"))
+        playbtn1.innerHTML = " Play Selected ";
+        row.appendChild(playbtn1);
+
+        //Create BM_Delete button #5
+        var deletebtn1 = document.createElement("button");
+        deletebtn1.setAttribute("class", "BM_delete");
+        deletebtn1.setAttribute("onclick", "row_Delete()");
+        deletebtn1.setAttribute("ts_dlt", `${x.currentTime}`);
+        deletebtn1.innerHTML = " Delete ";
+        row.appendChild(deletebtn1);
+
+        // Add the Row to the Table
+        let container = document.querySelector("#table1");
+        container.appendChild(row);
+
+        update_BM_objct(bookmark_value, x.currentTime, datetimecalc);
+
+        console.log(BM_objct);
+
+        return BM_objct;
+
+        //Comment Block
+        {
+          /* name1.innerHTML = bookmark_value;
+        name1.setAttribute('class', 'BM_name');
+
+        document.getElementById("table_BM").appendChild(name1); */
+          //console.log(bookmark_value);
+          /* let n = Bookmrk_Array.length;
+        console.log(n); */
+          /* let n = Object.keys(Bookmrk_Array).length
+        console.log(n); */
+          /*  let d =currentDateandTime();
+
+        let v = {
+          date: d,
+          Timestamp: x.currentTime,
+          Bookmark_name: bookmark_value
+        };
+
+        Bookmrk_Array.push(v);
+        console.log(Bookmrk_Array);
+        const myJSON = JSON.stringify(Bookmrk_Array);
+        var a = document.createElement("a");
+        a.href = window.URL.createObjectURL(new Blob([myJSON], {type: "text/plain"}));
+        a.download = "demo.json";
+        a.click(); */
+          /* let singleobj = {};
+        singleObj['date'] = 'date1';
+        singleObj['Timestamp'] = x.currentTime;
+        singleobj['Bookmark_name'] = bookmark_value;
+        Bookmrk_Array.push(singleObj); */
+          //Bookmrk_Array[n].Bookmark_name = n;
+          /* console.log(Bookmrk_Array[n-1].Bookmark_name);
+        Bookmrk_Array */
+        }
+      }
+
+      //OLD  Function to add new BM entries to the BM object-------------------------
+      /* function update_BM_objct(name, time_stamp, date) {
+            //console.log(Object.keys(BM_objct).length);
+              BM_objct[Object.keys(BM_objct).length] = {
+                name: name,
+                TS: time_stamp,
+                date: date,
+              };
+            //console.log(BM_objct[Object.keys(BM_objct).length]);
+            // console.log("The complete BM object is:  ");
+            console.log(BM_objct);
+            return BM_objct;
+          } */
+
+      function currentDateandTime() {
+        let current = new Date();
+        let cDate =
+          current.getFullYear() +
+          "-" +
+          (current.getMonth() + 1) +
+          "-" +
+          current.getDate();
+        let cTime =
+          current.getHours() +
+          ":" +
+          current.getMinutes() +
+          ":" +
+          current.getSeconds();
+        let dateTime = cDate + "_" + cTime;
+        return dateTime;
+      }
+
+      function play_Selected_Bookmark() {
+        //console.log("Play   CLicked!!!!!!!!!!!");
+        let active_Play = document.activeElement;
+        let active_Timestamp = active_Play.getAttribute("ts");
+        console.log("value1 is: " + active_Timestamp);
+        x.currentTime = active_Timestamp;
+        x.play();
+      }
+
+      function row_Delete() {
+        //console.log("Delete CLicked!!!!!!!!!!!");
+        if (confirm("Do You Wish To Delete The BookMark? ") == true) {
+          let active_Button = document.activeElement;
+          //console.log(active_Button.getAttribute("ts_dlt"));
+          let ts_tobe_deleted = active_Button.getAttribute("ts_dlt");
+          let parent_Row = active_Button.parentElement;
+          parent_Row.remove();
+          //alert(" Selected Bookmark Removed ");
+          //console.log(BM_objct);
+          delete BM_objct[ts_tobe_deleted];
+          //console.log(BM_objct);
+          return BM_objct;
+        }
+      }
+    </script>
+
+    <script>
+      //Declaring BM Object with Headers------------
+      var BM_objct = {
+        0: { name: "BM Name", TS: "TimeStamp", date: "Date" },
+      };
+
+      //update_BM_Rows_Display();
+
+      function removeExtension(filename) {
+        var lastDotPosition = filename.lastIndexOf(".");
+        if (lastDotPosition === -1) return filename;
+        else return filename.substr(0, lastDotPosition);
+      }
+
+      //console.log(BM_objct);
+      //console.log(BM_objct[4]);
+      //console.log(Object.keys(BM_objct).length);
+      /*  var current_objct_length = Object.keys(BM_objct).length; */
+
+      //Function to add new BM entries to the BM object-------------------------
+      function update_BM_objct(name, time_stamp, date) {
+        //console.log(Object.keys(BM_objct).length);
+
+        //Check if the user has typed any text in BM Name input field
+        //if the value is empty/null or just placeholder text then abort the function
+        if (name == null || name == "Chapter: ") {
+          console.log("Name: Null");
+          return;
+        }
+
+        //Add new entry to Bookmark Json object------------------------
+        BM_objct[time_stamp] = { name: name, TS: time_stamp, date: date };
+
+        //console.log(BM_objct[Object.keys(BM_objct).length]);
+        // console.log("The complete BM object is:  ");
+        //console.log(BM_objct);
+        //json_to_Text();
+        return BM_objct;
+      }
+
+      function json_to_Text() {
+        let myJSON = JSON.stringify(BM_objct);
+        //console.log(myJSON);
+      }
+
+      function save_Bookmarks_json() {
+        let json_string = JSON.stringify(BM_objct);
+
+        var a = document.createElement("a");
+        a.setAttribute(
+          "href",
+          "data:text/plain;charset=utf-8," + encodeURIComponent(json_string)
+        );
+        a.setAttribute("download", `${audiobook_name}.json`);
+        a.click();
+        /* const FileSystem = require("fs");
+          FileSystem.writeFile('BookMark.json', JSON.stringify(BM_objct), (error) => {
+            if (error) throw error;
+          }); */
+      }
+      
+      //Code to use onscreen buttons to play/pause & fastforward the audio
+      var hjb = document.getElementById("H-jump-back");
+        hjb.addEventListener("click", function () {
+          x.currentTime = x.currentTime - huge_Jump;
+          x.play();  
+          console.log("HJB");      
+        })
+
+      var ljb = document.getElementById("L-jump-back");
+        ljb.addEventListener("click", function () {
+          x.currentTime = x.currentTime - large_Jump;
+          x.play();  
+          console.log("LJB");      
+        })
+
+      var pre = document.getElementById("previous");
+        pre.addEventListener("click", function () {
+          x.currentTime = x.currentTime - small_Jump;
+          x.play();
+          console.log("SJB"); 
+        })
+
+      var next = document.getElementById("next");
+        next.addEventListener("click", function () {
+          x.currentTime = x.currentTime + small_Jump;
+          x.play();
+          console.log("SJF");           
+        })
+      
+      var ljf = document.getElementById("L-jump-front");
+        ljf.addEventListener("click", function () {
+          x.currentTime = x.currentTime + large_Jump;
+          x.play();
+          console.log("LJF");           
+        })
+
+        var hjf = document.getElementById("H-jump-front");
+        hjf.addEventListener("click", function () {
+          x.currentTime = x.currentTime + huge_Jump;
+          x.play();
+          console.log("HJF");           
+        })
+        
+
+        //Code to use Space bar & arrow keys to play/pause & fastforward the audio
+        document.onkeydown = checkKey;
+        function checkKey(e) {
+          e = e || window.event;
+
+          if (e.keyCode == '37') {
+              // left arrow
+              var ff = x.currentTime;
+              x.currentTime = ff - small_Jump;
+              x.play();
+          }
+          else if (e.keyCode == '39') {
+              // right arrow
+              var ff = x.currentTime;
+              x.currentTime = ff + small_Jump;
+              x.play();
+          }
+          else if (e.keyCode == '32') {
+              // Space bar
+                if (x.paused){
+                  e.preventDefault();
+                  x.play();
+                  console.log("playing");
+                }
+                else{
+                  e.preventDefault();
+                  x.pause();
+                  console.log("paused");
+                }
+          }
+        }
+//---------------------------------------------------------------------------
+
+
+
+    </script>
+  </body>
+
+  <!-- </head> -->
+</html>
