@@ -89,6 +89,11 @@
         margin-left: 0em;
         margin-right: 0.5em;
       }
+      #inputField {
+        min-width: 1em;
+        width: 7em;
+
+      }
 
       /* .spped_button {
       
@@ -395,6 +400,17 @@
       >
         1.65x
       </button>
+      <button
+        id="1.7x"
+        class="speed_button"
+        onclick="set_Speed()"
+        speed="1.7"
+      >
+        1.70x
+      </button>
+      <input type="text" id="inputField"
+        placeholder="Custom Speed: ">
+      <button class="speed_button" id="set_customspeed" onclick="set_CustomSpeed()">Set Speed</button>
     </div>
     
     <div class="cont2">
@@ -552,7 +568,22 @@
         console.log(active_speed);
         player.playbackRate = active_speed;
         let speed_label = document.getElementById("current_speed");
-        speed_label.innerHTML = "Current Playbck Rate:  " + active_speed;
+        speed_label.innerHTML = "Current Playback Rate:  " + active_speed;
+      }
+
+      function set_CustomSpeed(){
+        var custom_Speed = document.getElementById("inputField");
+        var inputValue = parseFloat(custom_Speed.value);
+        console.log(inputValue);
+        //console.log(typeof(inputValue));
+        if(inputValue > 0){
+          player.playbackRate = inputValue;
+          let speed_label = document.getElementById("current_speed");
+          speed_label.innerHTML = "Current Playback Rate:  " + inputValue;
+        }
+        
+        custom_Speed.value = "";
+
       }
 
       function playFrom() {
