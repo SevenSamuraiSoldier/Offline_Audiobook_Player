@@ -16,5 +16,8 @@ Controls:
 1. 5-second, 10-second, and 30-second time-jumps (seek) for going forward or backward in the audiobook.
 2. Play, Pause, and Stop buttons. Play/Pause can also be controlled using the spacebar on the keyboard.
 3. 5-second forward/backward can also be controlled using the right/left arrow keys on the keyboard.
-4. Speed/tempo controls from 1.05x to 1.65x for better flexibility.
+4. Speed/tempo controls from 1.05x to 1.7x for better flexibility. Ability to set your own custom playback speed.
 5. Add, Save, and Load buttons for bookmarks.
+6. Pause history is also accessible if you want to resume playback from a specific pause time.
+7. Set a pause timer if you want to pause playback automatically when you fall asleep while listening.
+   
