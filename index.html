@@ -11,7 +11,7 @@
     <style>
       body {
         box-sizing: border-box;
-        background-color: rgb(57, 58, 58);
+        background-color: #393a3a;
         font-family: Quicksand;
         margin: 0;
       }
@@ -31,6 +31,14 @@
         padding: 0.5em;
         margin: 0.5em;
         min-width: 10em;
+      }
+      #HS_play,
+      #close_popup {
+        padding-inline: 1em;
+        padding-top: 0.2em;
+        padding-bottom: 0.2em;
+        border-width: 0.18em;
+        min-width: 5em;
       }
 
       .audio_div {
@@ -148,7 +156,6 @@
         transition: all 0.2s ease-out;
       }
       
-     
       .speed_button_div > * ,
       .jump_button_div > * /* added on 2nd march*/{
         padding: 0.5em;
@@ -233,6 +240,7 @@
       .BM_play,
       .add_BM,
       .play_from,
+      .set_timer,
       .choose_button,
       .BM_save,
       .BM_load,
@@ -256,6 +264,7 @@
       .choose_button:hover,
       .add_BM:hover,
       .play_from:hover,
+      .set_timer:hover,
       .BM_save:hover,
       .BM_load:hover,
       .fullscreen_button:hover,
@@ -273,12 +282,73 @@
         transform: scale(1.05);
       }
 
+      
+      .HS_MasterPanel {
+        width: 45vw;
+        height: 80vh;
+        position: absolute;
+        left:77%;
+        top: 50%;
+        background-color: #295376;
+        border-radius: 0.8em;
+        transform: translate(-50%,-50%);
+        justify-content: center;
+        text-align: center;
+        overflow-y: scroll;
+        visibility: hidden;
+        padding-bottom: 0.5em;
+      }
+      
+      .HS_MainROW {
+        background-color: #aed580;
+        border-color: hsl(151, 55%, 44%);
+        border-bottom-width: 0.15em;
+        border-style: solid;
+        border-radius: 0.5em;
+        padding: 0.5em;
+        display: grid;
+        /* gap: 5px; */
+        grid-template-columns: 1fr 1fr 0.5fr;
+        align-items: center;
+        margin: 1em;
+        margin-bottom: 0.25em; 
+        margin-top: 0.25em;
+      }
+      #HS_Label {
+        color: azure;
+      }
+      .HS_label_Panel {
+        display: flex;
+        position: sticky;
+        top: 0;
+        width: auto;
+        height: 10%;
+        /* Adjust the background color as needed */
+        z-index: 1; /* Ensure the panel is on top of the scrollable content */
+        padding: 0.5em; /* Add some padding for better visibility */
+        flex-direction: row;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        align-content: center;
+        align-items: center;
+        background-color: #295376;
+
+      }
+      .non_Scrollable_Panel {
+        position: sticky;
+        display: grid;
+        z-index: 1; /* Ensure the panel is on top of the scrollable content */
+        padding: 0.5em;
+
+      }
+      
+
     </style>
     
   </head>
   <body>
     <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLWKjhJtqVAbllLK6r2dnGjUVWB_cFNcuO" title="YouTube video player" frameborder="10" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
-    <h1 class="h1_title">Audio Book Player</h1>
+    <h1 class="h1_title" id="mainTitle">Audio Book Player</h1>
     <button onclick="toggle_full_screen()" class="fullscreen_button">
       FullScreen
     </button>
@@ -321,16 +391,32 @@
         Display BookMarks
       </button>
     </div>
+    <!-------onclick function added on 29th may 2024----------------------------------->
     <div class="jump_button_div">
-      <button class="button" id="H-jump-back" name="HJB"></button>
-      <button class="button" id="L-jump-back" name="LJB"></button>
+      <button class="button" id="H-jump-back" name="HJB" onclick="set_Jump()"></button>
+      <button class="button" id="L-jump-back" name="LJB" onclick="set_Jump()"></button>
+      <button class="button" id="previous" onclick="set_Jump()"></button>
+      <button class="button" id="next" onclick="set_Jump()"></button>
+      <button class="button" id="L-jump-front" onclick="set_Jump()"></button>
+      <button class="button" id="H-jump-front" onclick="set_Jump()"></button>
 
-      <button class="button" id="previous"></button>
-      
-      <button class="button" id="next"></button>
-      <button class="button" id="L-jump-front"></button>
-      <button class="button" id="H-jump-front"></button>
+      <button class="button" id="history_popup" onclick="display_pause_History()">Pause History</button>
     </div>
+    <div class="HS_MasterPanel" id="HS_MasterPanel">
+      <div class="HS_label_Panel">
+        <label id="HS_Label"> Pause History </label>
+        <button class="button" id="close_popup" onclick="close_Panel()">Close</button>
+      </div>
+      
+      <div class="HS_MainROW" id="HS_MainROW">
+        <div class="BM_timestamp">Playback Time</div>
+        <div class="BM_timestamp">Date</div>
+        <div class="BM_date"></div>
+      </div>
+      <div id="history_panel" class="history_panel"></div>
+      
+    </div>
+    
 
 
     <div class="speed_button_div">
@@ -415,12 +501,25 @@
     
     <div class="cont2">
       <button class="play_from" onclick="playFrom()">Play from</button>
+
+      <!--- Another format to use time input fields-----------------------------------------
+      <input type="text" id="timeInput" pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$" placeholder="HH:MM:SS" class="text_field">
+      -->
+
+      <input type="number" id="hourInput" min="0" max="23" step="1" class="text_field" placeholder="HH:">
+      <input type="number" id="minuteInput" min="0" max="59" step="1" class="text_field" placeholder="MM:">
+      <input type="number" id="secondInput" min="0" max="59" step="1" class="text_field"placeholder="SS:">
+
+      <button class="set_timer" onclick="setTimer()">Set Timer</button>
+      <input type="number" id="minuteTimer" min="0" max="59" step="1" class="text_field" placeholder="MM:">
+      <input type="number" id="secondTimer" min="0" max="59" step="1" class="text_field"placeholder="SS:">
+
+      <!---
       <input class="text_field" type="number" id="timeStamp" />
-
       
-
       <div>Timestamp:</div>
       <input class="text_field" type="text" id="timepaused" />
+      ---->
 
       <label id="current_speed"> Current Playback Rate: </label>
     </div>
@@ -498,7 +597,7 @@
       const tempoBtn = document.querySelector("#tempo-btn");
       //const BM_File = document.querySelector();
       var x = document.getElementById("player");
-      var y = document.getElementById("timepaused");
+      //var y = document.getElementById("timepaused");
       var audiobook_name = "";
       player.volume = 0.3;
       const fileSelect = document.getElementById("fileSelect");
@@ -513,16 +612,22 @@
       //Jump button text display--------------------------------------------
       var HJB = document.getElementById("H-jump-back");
       HJB.innerHTML = jump_backlogo+" -"+huge_Jump+" Sec";
+      HJB.setAttribute("jump" , -huge_Jump);
       var LJB = document.getElementById("L-jump-back");
       LJB.innerHTML = jump_backlogo+" -"+large_Jump+" Sec";
+      LJB.setAttribute("jump" , -large_Jump);
       var SJB = document.getElementById("previous");
       SJB.innerHTML = jump_backlogo+" -"+small_Jump+" Sec";
+      SJB.setAttribute("jump" , -small_Jump);
       var SJF = document.getElementById("next");
       SJF.innerHTML = "+"+small_Jump+" Sec "+jump_frontlogo;
+      SJF.setAttribute("jump" , small_Jump);
       var LJF = document.getElementById("L-jump-front");
       LJF.innerHTML = "+"+large_Jump+" Sec "+jump_frontlogo;
+      LJF.setAttribute("jump" , large_Jump);
       var HJF = document.getElementById("H-jump-front");
       HJF.innerHTML = "+"+huge_Jump+" Sec "+jump_frontlogo;
+      HJF.setAttribute("jump" , huge_Jump);
       //----------------------------------------------------------------------
 
       fileSelect.addEventListener(
@@ -556,8 +661,6 @@
           BM_reader.readAsText(file);
           
         }
-        
-
         /* BM_objct = JSON.parse(e.target.files[0]);
         console.log(BM_objct); */
       });
@@ -581,15 +684,48 @@
           let speed_label = document.getElementById("current_speed");
           speed_label.innerHTML = "Current Playback Rate:  " + inputValue;
         }
-        
         custom_Speed.value = "";
-
       }
 
+      //- Common function for all jump buttons- Added on 29th may 2024--------
+      function set_Jump(){
+        
+        let jump = document.activeElement?.getAttribute("jump");
+        var number_jump = parseInt(jump, 10);
+        x.currentTime = x.currentTime + parseInt(jump, 10);
+        
+        /*--- Old Code (more lines)----------------------
+        let active_jump_btn = document.activeElement;
+        let jump = active_jump_btn.getAttribute("jump");
+        console.log(typeof(jump) + " " + jump);
+        console.log(typeof(number_jump) + "  " + number_jump);
+        x.currentTime = x.currentTime + number_jump;
+        console.log(x.currentTime);
+        */
+      }
+
+      var hrInput = document.getElementById('hourInput');
+      var minsInput = document.getElementById('minuteInput');
+      var secInput = document.getElementById('secondInput');
       function playFrom() {
+        const hour = parseInt(hrInput.value, 10) || 0;
+        const minute = parseInt(minsInput.value, 10) || 0;
+        const second = parseInt(secInput.value, 10) || 0;
+        //console.log(hour+" : "+minute+" : "+second);
+      
+        var timeSecondsPlay = hour*3600 + minute*60 + second;
+        //console.log(timeSecondsPlay);
+        x.currentTime = timeSecondsPlay;
+        x.play();
+        hrInput.value ="";
+        minsInput.value ="";
+        secInput.value ="";
+
+          /* ---- Old Code -----------------------------------------
         var timeStamp = document.getElementById("timeStamp").value;
         x.currentTime = timeStamp;
         x.play();
+        */
       }
 
       audioFile.addEventListener("change", (e) => {
@@ -604,6 +740,11 @@
         //alert('Selected file with extension: ' + e.target.files[0].name);
         audiobook_name = removeExtension(e.target.files[0].name);
         console.log(audiobook_name);
+
+        //-- To change the Main title to the name of the audiobook --------------------
+        var audiobook_Title = document.getElementById("mainTitle");
+        audiobook_Title.innerText = audiobook_name;
+
         alert("Selected file:  " + audiobook_name);
         //console.log(e.target.files[0].webkitRelativePath);
         /* alert('Selected file: ' + name.files.item(0).size);
@@ -612,15 +753,77 @@
     </script>
 
     <script>
-      function add_pause_History() {
-        //do something
-      }
-
       function load_BM_Json_File() {
-        //Load BM Json file from user device
-        //Then Modify BM_Objct as per the loaded file
+        /*Load BM Json file from user device
+         Then Modify BM_Objct as per the loaded file */
       }
 
+      //Function to Display data of Pause history Object on the webpage -----------------
+      function display_pause_History() {
+        //update/ADD BM rows from BM Json file data
+        let container = document.querySelector("#history_panel");
+
+        //-- To clear the Main Pause History Panel to avoide duplication of entries ----
+        container.innerHTML="";
+        
+        for (var key_TS in HS_objct) {
+          
+          var BM_ts1 = HS_objct[key_TS].TS;
+          var BM_date1 = HS_objct[key_TS].date;
+
+          if (key_TS == 0) {
+            continue;
+          }
+
+          //console.log("1: " + BM_ts1 + " 2: " + BM_date1);
+
+          //Start--------------------------------------------------
+          //Create Main BM Row
+          var row = document.createElement("div");
+          row.setAttribute("class", "HS_MainROW");
+
+          //Create Pause_Time stamp #1
+          var timestamp1 = document.createElement("div");
+          const timeinseconds = new Date(null);
+          timeinseconds.setSeconds(BM_ts1); // specify value for SECONDS here
+          const formatted_Timestamp = timeinseconds.toISOString().slice(11, 19);
+          timestamp1.innerHTML = formatted_Timestamp;
+          timestamp1.setAttribute("class", "BM_timestamp");
+          row.appendChild(timestamp1);
+
+          //Create Pause_Date #2
+          var date1 = document.createElement("div");
+          datetimecalc = currentDateandTime();
+          date1.innerHTML = BM_date1;
+          date1.setAttribute("class", "BM_date");
+          row.appendChild(date1);
+
+          //Create History_Play button #3
+          var playbtn1 = document.createElement("button");
+          playbtn1.setAttribute("class", "BM_play");
+          playbtn1.setAttribute("id", "HS_play");
+          playbtn1.setAttribute("onclick", "play_History()");
+          playbtn1.setAttribute("ts", `${BM_ts1}`);
+          //console.log("current time stamp: "+ playbtn1.getAttribute("ts"))
+          playbtn1.innerHTML = "Play";
+          row.appendChild(playbtn1);
+
+          // Add the Row to the Table
+          container.appendChild(row);
+        }
+        // -- To set the visibility of Main Pause History panel to Visible -----------
+        var hsPanel = document.getElementById("HS_MasterPanel");
+        hsPanel.style.visibility = 'visible';
+      }
+
+      function close_Panel() {
+        var hsPanel = document.getElementById("HS_MasterPanel");
+        hsPanel.style.visibility = 'hidden';
+      }
+
+      
+
+      //Function to Display data of BM Object on the webpage  -------------------------------------
       function update_BM_Rows_Display() {
         //update/ADD BM rows from BM Json file data
         for (var key_TS in BM_objct) {
@@ -631,8 +834,7 @@
           if (key_TS == 0) {
             continue;
           }
-
-          console.log("1: " + BM_name1 + " 2: " + BM_ts1 + " 3: " + BM_date1);
+          //console.log("1: " + BM_name1 + " 2: " + BM_ts1 + " 3: " + BM_date1);
 
           //Start--------------------------------------------------
           //Create Main BM Row
@@ -648,16 +850,11 @@
 
           //Create BM_Time stamp #2
           var timestamp1 = document.createElement("div");
-
           const timeinseconds = new Date(null);
           timeinseconds.setSeconds(BM_ts1); // specify value for SECONDS here
           const formatted_Timestamp = timeinseconds.toISOString().slice(11, 19);
           timestamp1.innerHTML = formatted_Timestamp;
           timestamp1.setAttribute("class", "BM_timestamp");
-
-
-          //timestamp1.innerHTML = BM_ts1;
-          //timestamp1.setAttribute("class", "BM_timestamp");
           row.appendChild(timestamp1);
 
           //Create BM_Date #3
@@ -690,14 +887,16 @@
         }
       }
 
+      //Function to add new BookMark Entry -------------------------------------
       function add_Bookmark() {
         x.pause();
-        y.value = x.currentTime;
+        //y.value = x.currentTime;
         bookmark_value = prompt("Please enter a Bookmark Name", "Chapter: ");
         if (bookmark_value == null || bookmark_value == "Chapter: ") {
           console.log("Name: Null");
           return;
         }
+
         //Create Main BM Row
         var row = document.createElement("div");
         row.setAttribute("class", "BM_MainROW");
@@ -711,16 +910,11 @@
 
         //Create BM_Time stamp #2
         var timestamp1 = document.createElement("div");
-
         const timeinseconds = new Date(null);
         timeinseconds.setSeconds(x.currentTime); // specify value for SECONDS here
         const formatted_Timestamp = timeinseconds.toISOString().slice(11, 19);
         timestamp1.innerHTML = formatted_Timestamp;
         timestamp1.setAttribute("class", "BM_timestamp");
-
-
-        //timestamp1.innerHTML = x.currentTime;
-        //timestamp1.setAttribute("class", "BM_timestamp");
         row.appendChild(timestamp1);
 
         //Create BM_Date #3
@@ -751,9 +945,9 @@
         let container = document.querySelector("#table1");
         container.appendChild(row);
 
+        // -- Update BM Object -------------------------------------
         update_BM_objct(bookmark_value, x.currentTime, datetimecalc);
-
-        console.log(BM_objct);
+        //console.log(BM_objct);
 
         return BM_objct;
 
@@ -808,24 +1002,26 @@
             return BM_objct;
           } */
 
-      function currentDateandTime() {
-        let current = new Date();
-        let cDate =
-          current.getFullYear() +
-          "-" +
-          (current.getMonth() + 1) +
-          "-" +
-          current.getDate();
-        let cTime =
-          current.getHours() +
-          ":" +
-          current.getMinutes() +
-          ":" +
-          current.getSeconds();
-        let dateTime = cDate + "_" + cTime;
-        return dateTime;
-      }
+      //Function to calculated current date & time for BM & HS objects -------------------------
+        function currentDateandTime() {
+          let current = new Date();
+          let cDate =
+            current.getFullYear() +
+            "-" +
+            (current.getMonth() + 1) +
+            "-" +
+            current.getDate();
+          let cTime =
+            current.getHours() +
+            ":" +
+            current.getMinutes() +
+            ":" +
+            current.getSeconds();
+          let dateTime = cDate + "_" + cTime;
+          return dateTime;
+        }
 
+      //Function to Play selected BookMark entry -------------------------
       function play_Selected_Bookmark() {
         //console.log("Play   CLicked!!!!!!!!!!!");
         let active_Play = document.activeElement;
@@ -833,6 +1029,17 @@
         console.log("value1 is: " + active_Timestamp);
         x.currentTime = active_Timestamp;
         x.play();
+      }
+
+      //Function to Play selected pause history entry -------------------------
+      function play_History() {
+        //console.log("Play   CLicked!!!!!!!!!!!");
+        let active_Play = document.activeElement;
+        let active_Timestamp = active_Play.getAttribute("ts");
+        //console.log("value1 is: " + active_Timestamp);
+        x.currentTime = active_Timestamp;
+        x.play();
+        close_Panel();
       }
 
       function row_Delete() {
@@ -853,23 +1060,21 @@
     </script>
 
     <script>
-      //Declaring BM Object with Headers------------
+      //Declaring BM Object with Headers--------------------------------------
       var BM_objct = {
         0: { name: "BM Name", TS: "TimeStamp", date: "Date" },
       };
 
-      //update_BM_Rows_Display();
+      //Declaring Pause History Object with Headers--------------------------------------
+      var HS_objct = {
+        0: {TS: "TimeStamp", date: "Date" },
+      };
 
       function removeExtension(filename) {
         var lastDotPosition = filename.lastIndexOf(".");
         if (lastDotPosition === -1) return filename;
         else return filename.substr(0, lastDotPosition);
       }
-
-      //console.log(BM_objct);
-      //console.log(BM_objct[4]);
-      //console.log(Object.keys(BM_objct).length);
-      /*  var current_objct_length = Object.keys(BM_objct).length; */
 
       //Function to add new BM entries to the BM object-------------------------
       function update_BM_objct(name, time_stamp, date) {
@@ -890,6 +1095,14 @@
         //console.log(BM_objct);
         //json_to_Text();
         return BM_objct;
+      }
+
+      //Function to add new pause history entries to the HS object-------------------------
+      function update_HS_objct(time_stamp, date) {
+        
+        //Add new entry to pause history Json object------------------------
+        HS_objct[time_stamp] = { TS: time_stamp, date: date };
+        return HS_objct;
       }
 
       function json_to_Text() {
@@ -913,51 +1126,54 @@
           }); */
       }
       
-      //Code to use onscreen buttons to play/pause & fastforward the audio
-      var hjb = document.getElementById("H-jump-back");
-        hjb.addEventListener("click", function () {
-          x.currentTime = x.currentTime - huge_Jump;
-          x.play();  
-          console.log("HJB");      
-        })
+      {/*Code to use onscreen buttons to play/pause & fastforward the audio
+        var hjb = document.getElementById("H-jump-back");
+          hjb.addEventListener("click", function () {
+            x.currentTime = x.currentTime - huge_Jump;
+            x.play();  
+            console.log("HJB");      
+          })
 
-      var ljb = document.getElementById("L-jump-back");
-        ljb.addEventListener("click", function () {
-          x.currentTime = x.currentTime - large_Jump;
-          x.play();  
-          console.log("LJB");      
-        })
+        var ljb = document.getElementById("L-jump-back");
+          ljb.addEventListener("click", function () {
+            x.currentTime = x.currentTime - large_Jump;
+            x.play();  
+            console.log("LJB");      
+          })
 
-      var pre = document.getElementById("previous");
-        pre.addEventListener("click", function () {
-          x.currentTime = x.currentTime - small_Jump;
-          x.play();
-          console.log("SJB"); 
-        })
+        var pre = document.getElementById("previous");
+          pre.addEventListener("click", function () {
+            x.currentTime = x.currentTime - small_Jump;
+            x.play();
+            console.log("SJB"); 
+          })
 
-      var next = document.getElementById("next");
-        next.addEventListener("click", function () {
-          x.currentTime = x.currentTime + small_Jump;
-          x.play();
-          console.log("SJF");           
-        })
-      
-      var ljf = document.getElementById("L-jump-front");
-        ljf.addEventListener("click", function () {
-          x.currentTime = x.currentTime + large_Jump;
-          x.play();
-          console.log("LJF");           
-        })
-
-        var hjf = document.getElementById("H-jump-front");
-        hjf.addEventListener("click", function () {
-          x.currentTime = x.currentTime + huge_Jump;
-          x.play();
-          console.log("HJF");           
-        })
+        var next = document.getElementById("next");
+          next.addEventListener("click", function () {
+            x.currentTime = x.currentTime + small_Jump;
+            x.play();
+            console.log("SJF");           
+          })
         
+        var ljf = document.getElementById("L-jump-front");
+          ljf.addEventListener("click", function () {
+            x.currentTime = x.currentTime + large_Jump;
+            x.play();
+            console.log("LJF");           
+          })
 
-        //Code to use Space bar & arrow keys to play/pause & fastforward the audio
+          var hjf = document.getElementById("H-jump-front");
+          hjf.addEventListener("click", function () {
+            x.currentTime = x.currentTime + huge_Jump;
+            x.play();
+            console.log("HJF");           
+          })
+        */
+        }
+        
+//------------------------------------------------------------------------------------------------
+
+        // --- Code to use Space bar & arrow keys to play/pause & fastforward the audio---------
         document.onkeydown = checkKey;
         function checkKey(e) {
           e = e || window.event;
@@ -979,16 +1195,89 @@
                 if (x.paused){
                   e.preventDefault();
                   x.play();
-                  console.log("playing");
+                  //console.log("playing");
                 }
                 else{
                   e.preventDefault();
                   x.pause();
-                  console.log("paused");
+                  //console.log("paused");
+
+                  datetimecalc = currentDateandTime();
+                  update_HS_objct(x.currentTime, datetimecalc);
+                  //console.log(HS_objct);
                 }
+                
           }
         }
-//---------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+
+        // -- To monitor if the audio is paused by pause button or by headphone's pause bttn------
+        // -- To update the pause history object after the audio is paused -----------------------
+        x.addEventListener('pause', () => {
+
+          //console.log('Audio paused');
+          datetimecalc = currentDateandTime();
+          update_HS_objct(x.currentTime, datetimecalc);
+        });
+
+//------------------------------------------------------------------------------------------------
+
+        let timer;
+        let isActive = true;
+        // User-specified time in milliseconds (e.g., 5 minutes = 300000 ms)
+        var inactivityTime = 300000;
+
+        function setTimer(){
+          isActive = true;
+          var t1 = document.getElementById("minuteTimer");
+          var t2 = document.getElementById("secondTimer");
+          //var t3 = 
+          var minute = parseInt(t1.value, 10) || 0;
+          var sec = parseInt(t2.value, 10) || 0;
+          var t3 = (minute*60 + sec) * 1000;
+          //console.log(t3);
+          if (t3 == 0){
+            t3 = 300000; //-----5mins
+            console.log("time t3 is: " + t3/1000 + " secs");
+          }
+          inactivityTime = t3;
+          console.log("time is: "+inactivityTime);
+          resetTimer();
+          // Event listeners for mouse movement and keyboard activity
+          document.addEventListener("mousemove", resetTimer);
+          document.addEventListener("keydown", resetTimer);
+
+        }
+
+        // Function to reset the timer
+        function resetTimer() {
+          clearTimeout(timer);
+          console.log("reset timer function is called");
+          console.log("flag is: "+isActive);
+          timer = setTimeout(showInactivityDialog, inactivityTime);
+        }
+
+        // Function to show the inactivity dialog
+        function showInactivityDialog() {
+          if (isActive) {
+            isActive = false;
+            x.pause();
+            const message = "You have been inactive for some time. The playback is paused. Press OK to reset the timer or Press Cancel to abort the timer.";
+            const confirmDialog = confirm(message);
+            
+            if (confirmDialog) {
+              resetTimer();
+              isActive = true;
+              console.log("flag is: " + isActive);
+            } else {
+              // Perform any additional actions if the user chooses to leave the page
+              console.log("User chose to leave the page.");
+              console.log("flag is: "+isActive);
+            }
+          }
+        }
+      
+//------------------------------------------------------------------------------------------------
 
 
 
